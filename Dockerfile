@@ -15,8 +15,7 @@ WORKDIR /app
 COPY . .
 
 # Clean node_modules and package-lock.json to ensure clean installation
-RUN rm -rf node_modules package-lock.json && \
-    npm install
+RUN npm install -y
 
 # Expose the port that the application will run on
 EXPOSE 3000
