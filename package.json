@@ -1,0 +1,25 @@
+{
+  "name": "ecome",
+  "version": "10.1.1",
+  "description": "ecome tool",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",  // Ensure you have a start script
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JorgeOJara/ecome.git"
+  },
+  "keywords": [],
+  "author": "Jorge Jara",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",  // Express for server
+    "bcryptjs": "^2.4.3",  // Bcrypt for password hashing
+    "express-session": "^1.17.3",  // Express sessions
+    "sqlite3": "^5.0.11",  // SQLite3 database
+    "connect-sqlite3": "^0.0.11",  // Session store for SQLite
+    "multer": "^1.4.5-lts.1"  // Multer for file uploads
+  }
+}
