@@ -1,9 +1,11 @@
-# Use a Node.js image based on Debian
-FROM node:18-slim
+# Use a Debian-based image
+FROM debian:bullseye-slim
 
-# Install additional dependencies (optional, based on your app needs)
+# Install Node.js, Git, and other dependencies
 RUN apt-get update && \
-    apt-get install -y git && \
+    apt-get install -y curl git build-essential && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory inside the container

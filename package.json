@@ -4,7 +4,7 @@
   "description": "ecome tool",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",  // Ensure you have a start script
+    "start": "node index.js",
     "test": "echo \"No test specified\" && exit 0"
   },
   "repository": {
@@ -15,11 +15,11 @@
   "author": "Jorge Jara",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",  // Express for server
-    "bcryptjs": "^2.4.3",  // Bcrypt for password hashing
-    "express-session": "^1.17.3",  // Express sessions
-    "sqlite3": "^5.0.11",  // SQLite3 database
-    "connect-sqlite3": "^0.0.11",  // Session store for SQLite
-    "multer": "^1.4.5-lts.1"  // Multer for file uploads
+    "express": "^4.18.2",
+    "bcryptjs": "^2.4.3",
+    "express-session": "^1.17.3",
+    "sqlite3": "^5.0.11",
+    "connect-sqlite3": "^0.0.11",
+    "multer": "^1.4.5-lts.1"
   }
 }
