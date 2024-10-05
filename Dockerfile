@@ -11,8 +11,8 @@ RUN apt-get update && \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Clone the project repository
-RUN git clone https://github.com/JorgeOJara/ecome.git .
+# Copy the current directory's contents to the /app directory in the container
+COPY . .
 
 # Install project dependencies using npm
 RUN npm install
