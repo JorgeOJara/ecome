@@ -23,7 +23,7 @@ RUN rm -rf node_modules package-lock.json && \
     npm install
 
 # Expose the port that the application will run on
-EXPOSE 3000
+EXPOSE 80
 
 # Start the application using Node.js
 CMD ["node", "index.js"]
