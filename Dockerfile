@@ -15,7 +15,7 @@ WORKDIR /app/
 # Copy the current directory's contents to the /app directory in the container
 COPY . .
 
-# Update npm to 10.9.0 before running project npm install
+# Update npm to 10.9.0 globally before running project npm install
 RUN npm install -g npm@10.9.0
 
 # Clean node_modules and package-lock.json to ensure a clean installation
