@@ -1,7 +1,7 @@
-# Use a Debian-based image
+# Use the regular Debian 18-bullseye-slim base image
 FROM debian:bullseye-slim
 
-# Install Node.js, Git, and other dependencies
+# Install curl, Node.js, and npm from NodeSource, along with other necessary dependencies
 RUN apt-get update && \
     apt-get install -y curl git build-essential && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
@@ -14,8 +14,9 @@ WORKDIR /app
 # Copy the current directory's contents to the /app directory in the container
 COPY . .
 
-# Install project dependencies using npm
-RUN npm install
+# Clean node_modules and package-lock.json to ensure clean installation
+RUN rm -rf node_modules package-lock.json && \
+    npm install
 
 # Expose the port that the application will run on
 EXPOSE 3000
