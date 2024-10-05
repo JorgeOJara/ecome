@@ -1,0 +1,40 @@
+<%- include('partials/header', { title: 'Contact Requests', cssFile: 'admin.css' }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-5">
+    <h2 class="text-center">Contact Requests</h2>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% requests.forEach(function(request) { %>
+                <tr>
+                    <td><%= request.id %></td>
+                    <td><%= request.name %></td>
+                    <td><%= request.email %></td>
+                    <td><%= request.message %></td>
+                    <td><%= new Date(request.createdAt).toLocaleString() %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

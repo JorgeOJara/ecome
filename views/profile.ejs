@@ -1,0 +1,148 @@
+<%- include('partials/header', { title: 'User Profile', cssFile: 'profile.css' }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mx-auto my-8">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Left Profile Section -->
+        <div class="w-full md:w-1/3">
+            <div class="bg-white rounded-lg shadow-md p-6 text-center">
+                <img src="https://via.placeholder.com/150" class="rounded-full w-32 h-32 mx-auto mb-4" alt="User Image">
+                <h4 class="text-xl font-bold"><%= user.firstName %> <%= user.lastName %></h4>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h5 class="text-lg font-bold mb-4">Contact Information</h5>
+                <p><i class="fas fa-envelope"></i> <%= user.email %></p>
+                <p><i class="fas fa-phone"></i> <%= user.phone %></p>
+                <p><i class="fas fa-map-marker-alt"></i> <%= user.address %></p>
+            </div>
+        </div>
+
+        <!-- Right Info and Orders Section -->
+        <div class="w-full md:w-2/3">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h5 class="text-lg font-bold mb-4">Profile Information</h5>
+                <form id="profileForm" action="/profile" method="POST">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" id="firstName" name="firstName" value="<%= user.firstName %>" required>
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" id="lastName" name="lastName" value="<%= user.lastName %>" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" id="email" name="email" value="<%= user.email %>" required>
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" id="phone" name="phone" value="<%= user.phone %>" required>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
+                        <textarea class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" id="address" name="address" rows="3" required><%= user.address %></textarea>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Update Profile</button>
+                </form>
+            </div>
+
+            <!-- Orders Section -->
+            <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                <h5 class="text-lg font-bold mb-4">Order History</h5>
+                <% if (orders.length > 0) { %>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-left text-sm uppercase font-semibold">
+                                    <th class="border-b px-4 py-2">Order ID</th>
+                                    <th class="border-b px-4 py-2">Order Status</th>
+                                    <th class="border-b px-4 py-2">DATE</th>
+                                
+                                    <th class="border-b px-4 py-2">Total</th>
+                            
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(function(order) { %>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border-b px-4 py-2"><%= order.order_id %></td>
+                                    <td class="border-b px-4 py-2"><%= order.status %></td>
+                                    <td class="border-b px-4 py-2"><%= new Date(order.createdAt).toLocaleString() %></td>
+                                 
+                                    <td class="border-b px-4 py-2">$<%= order.total.toFixed(2) %></td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <p class="text-gray-600">You have no orders yet.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Update Success -->
+<div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50" id="updateSuccessModal" style="display: none;">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h5 class="text-lg font-bold" id="updateSuccessModalLabel">Update Successful</h5>
+        <p class="mt-4">Your profile information has been successfully updated!</p>
+        <div class="mt-4 text-right">
+            <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="closeModal('updateSuccessModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Update Error -->
+<div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50" id="updateErrorModal" style="display: none;">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h5 class="text-lg font-bold" id="updateErrorModalLabel">Update Failed</h5>
+        <p class="mt-4">There was an error updating your information. Please try again.</p>
+        <div class="mt-4 text-right">
+            <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="closeModal('updateErrorModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to close modals
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Check for update status and show corresponding modal
+    <% if (typeof success !== 'undefined' && success) { %>
+        document.getElementById('updateSuccessModal').style.display = 'flex';
+    <% } else if (typeof error !== 'undefined' && error) { %>
+        document.getElementById('updateErrorModal').style.display = 'flex';
+    <% } %>
+
+    // Get all the "Details" buttons
+    document.querySelectorAll('.toggle-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            const detailsRow = document.getElementById(`orderDetails-${orderId}`);
+
+            // Toggle the visibility of the details row
+            if (detailsRow.classList.contains('hidden')) {
+                detailsRow.classList.remove('hidden');
+                detailsRow.classList.add('block');
+            } else {
+                detailsRow.classList.remove('block');
+                detailsRow.classList.add('hidden');
+            }
+        });
+    });
+</script>
+
+<%- include('partials/footer') %>
+</body>
+</html>

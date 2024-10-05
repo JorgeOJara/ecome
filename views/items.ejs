@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/<%= cssFile %>">
+    <style>
+        .table td, .table th {
+            white-space: nowrap;
+        }
+        .table-container {
+            overflow-x: scroll;
+            scrollbar-width: thin;
+            scrollbar-color: darkgrey lightgrey;
+        }
+        .table-container::-webkit-scrollbar {
+            height: 12px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: darkgrey;
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background-color: lightgrey;
+        }
+        tr.clickable-row {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', { title: 'Products List', cssFile: 'products.css' }) %>
+    <% if (user && user.role === 'admin') { %>
+        <%- include('partials/admin_sidebar') %>
+    <% } %>
+    
+    <div class="container mt-5">
+        <h1 class="text-center">Products List</h1>
+
+        <div class="table-container">
+            <table class="table table-bordered table-hover mt-4">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Discount Amount</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach(function(product) { %>
+                        <tr class="clickable-row" data-href="/products/<%= product.product_id %>">
+                            <td><%= product.product_id %></td>
+                            <td><%= product.name %></td>
+                            <td><%= product.description %></td>
+                            <td>$<%= product.price.toFixed(2) %></td>
+                            <td>$<%= product.discount_amount.toFixed(2) %></td>
+                            <td><%= product.stock %></td>
+                            <td><%= product.category %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Make the rows clickable
+        $(document).ready(function() {
+            $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+</body>
+</html>

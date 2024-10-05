@@ -1,0 +1,61 @@
+     
+        body {
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.card-img-top {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #6c757d;
+    border: none;
+    border-radius: 30px;
+}
+
+.btn-primary:hover {
+    background-color: #5a6268;
+}
+
+.carousel-item img {
+    border-radius: 20px;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+#contactForm {
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#contactForm .form-control {
+    border-radius: 10px;
+}
+
+#contactForm .btn-primary {
+    border-radius: 20px;
+}
+
+.img-fluid {
+    border-radius: 20px;
+}

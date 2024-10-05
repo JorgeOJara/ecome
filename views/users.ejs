@@ -1,0 +1,45 @@
+<%- include('partials/header', { title: 'Users Table', cssFile: 'users.css' }) %>
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-5">
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>User ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Email</th> <!-- Added Email Column -->
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(function(user) { %>
+                <tr>
+                    <td><%= user.id %></td>
+                    <td><%= user.firstName %></td>
+                    <td><%= user.lastName %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.email %></td> <!-- Display Email value -->
+                    <td><%= user.phone %></td>
+                    <td><%= user.address %></td>
+                    <td><%= user.role %></td>
+                    <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<%- include('partials/header', { title: 'Thank You', cssFile: 'thank_you.css' }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-4">
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2 text-center">
+            <div class="card">
+                <div class="card-body">
+                    <h2>Thank You for Reaching Out!</h2>
+                    <p>We have received your message and will get back to you as soon as possible.</p>
+                    <p>Please expect an email response from one of our customer service representatives.</p>
+                    <a href="/" class="btn btn-primary mt-3">Go Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<%- include('partials/header', { title: 'Contact', cssFile: 'contact.css' }) %>
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-4">
+    <!-- Contact Form Section -->
+    <div class="mt-5">
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <img src="/images/call.webp" class="img-fluid rounded" alt="Contact Image">
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+                <form id="contactForm" action="/contact" method="POST" class="w-100">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <!-- Pre-populate name if the user is logged in -->
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" value="<%= user ? user.firstName + ' ' + user.lastName : '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <!-- Pre-populate email if the user is logged in -->
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" value="<%= user ? user.email : '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="8" placeholder="Enter your message" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrap.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

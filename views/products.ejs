@@ -1,0 +1,94 @@
+<%- include('partials/header', { title: 'Product Showcase', cssFile: cssFile }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-4">
+    <!-- Products Section -->
+    <div class="mt-5">
+        <div class="row mt-4">
+            <% products.forEach(product => { %>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product Image">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= product.name %></h5>
+                            <p class="card-text">$<%= product.price %></p>
+                        </div>
+                        <div class="card-footer">
+                            <% if (user) { %>
+                                <!-- Show Add to Cart button if user is logged in -->
+                                <button class="btn btn-primary" onclick="addToCart('<%= product.product_id %>', '<%= product.name %>', <%= product.price %>)">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            <% } else { %>
+                                <!-- No button for non-logged-in users, but clickable card -->
+                                <button class="btn btn-secondary" onclick="showLoginModal()">
+                                    <i class="fas fa-cart-plus"></i> Add
+                                </button>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                To continue shopping and add items to your cart, please log in to your account or create a new one.
+            </div>
+            <div class="modal-footer">
+                <a href="/login" class="btn btn-primary">Login</a>
+                <a href="/register" class="btn btn-secondary">Create Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+    // Function to show the login modal
+    function showLoginModal() {
+        $('#loginModal').modal('show');
+    }
+
+    // Cart logic for logged-in users
+    const currentUserId = "<%= user ? user.id : '' %>";
+    let storedCartData = JSON.parse(localStorage.getItem('cartData')) || {};
+    let cart = storedCartData.cart || {};
+    let storedUserId = storedCartData.userId;
+
+    if (currentUserId && storedUserId !== currentUserId) {
+        cart = {};
+        localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
+    }
+
+    function addToCart(id, name, price) {
+        if (!cart[id]) {
+            cart[id] = { id, name, price, quantity: 0 };
+        }
+        cart[id].quantity += 1;
+        localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
+    }
+</script>
+
+<!-- jQuery, Popper.js, and Bootstrap JS for modal functionality -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

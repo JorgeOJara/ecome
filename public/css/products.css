@@ -1,0 +1,58 @@
+ body {
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .card {
+            border-radius: 20px;
+        }
+
+        .card-img-top {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .card-body {
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #6c757d;
+            border: none;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .carousel-item img {
+            border-radius: 20px;
+        }
+
+        h2 {
+            font-weight: bold;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: transparent;
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .card-footer .btn {
+            margin-left: auto;
+        }

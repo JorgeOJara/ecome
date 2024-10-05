@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - E-Shop</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="/css/<%= cssFile %>" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/" class="text-2xl font-bold text-gray-800">E-Shop</a>
+                </div>
+
+                <!-- Links (hidden on mobile) -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="/products" class="text-gray-600 hover:text-gray-900">Shop</a>
+                    <a href="/contact" class="text-gray-600 hover:text-gray-900">Contact</a>
+                    <a href="/cart" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
+
+                <!-- User authentication logic -->
+                <div class="flex items-center space-x-4">
+                    <% if (user) { %>
+                    <!-- If user is logged in -->
+                    <a href="/profile" class="text-gray-600 hover:text-gray-900">Welcome, <%= user.firstName %></a>
+                    <a href="/logout" class="text-gray-600 hover:text-gray-900">Logout</a>
+                    <% } else { %>
+                    <!-- If user is not logged in -->
+                    <a href="/login" class="text-gray-600 hover:text-gray-900">Login</a>
+                    <a href="/register" class="text-gray-600 hover:text-gray-900">Register</a>
+                    <% } %>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" class="bg-gray-100 inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-200 focus:outline-none">
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu, hidden by default -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/products" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Shop</a>
+                <a href="/contact" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Contact</a>
+                <a href="/cart" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+
+                <% if (user) { %>
+                <!-- If user is logged in -->
+                <a href="/profile" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Welcome, <%= user.firstName %></a>
+                <a href="/logout" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Logout</a>
+                <% } else { %>
+                <!-- If user is not logged in -->
+                <a href="/login" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Login</a>
+                <a href="/register" class="block text-gray-600 hover:bg-gray-100 hover:text-gray-900 rounded-md px-3 py-2">Register</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toggle Mobile Menu Script -->
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+    <!-- Bootstrap JS (for modals, carousels, etc.) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

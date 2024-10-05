@@ -1,0 +1,39 @@
+
+        body {
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.card-img-top {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #6c757d;
+    border: none;
+    border-radius: 30px;
+}
+
+.btn-primary:hover {
+    background-color: #5a6268;
+}
+
+.carousel-item img {
+    border-radius: 20px;
+}
+
+h2 {
+    font-weight: bold;
+}

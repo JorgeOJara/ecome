@@ -1,0 +1,36 @@
+/* thank_you.css */
+body {
+    background-color: #f9f9f9;
+}
+
+.card {
+    margin-top: 50px;
+    padding: 30px;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #333;
+}
+
+p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+
+
+body {
+    background-color: #eaeff1;
+    font-family: 'Poppins', sans-serif;
+}
+
+a.btn-primary {
+    transition: all 0.3s ease;
+}
+
+a.btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+}
+

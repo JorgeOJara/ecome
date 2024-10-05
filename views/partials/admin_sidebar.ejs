@@ -1,0 +1,93 @@
+<style>
+    .admin-sidebar {
+        position: absolute;
+        top: 100;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background-color: #343a40;
+        color: white;
+        z-index: 9999;
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%); /* Initially hidden */
+    }
+
+    .admin-sidebar.show {
+        transform: translateX(0); /* Show when toggled */
+    }
+
+    .admin-sidebar .nav-link {
+        color: white;
+        padding: 10px 15px;
+    }
+
+    .admin-sidebar .nav-link:hover {
+        background-color: #495057;
+    }
+
+    .toggle-button {
+        position: absolute;
+        top: 20px;
+        right: -25px;
+        background-color: #343a40;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .toggle-button span {
+        color: white;
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .container.with-sidebar {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease-in-out;
+    }
+</style>
+
+<div id="admin-sidebar" class="admin-sidebar">
+    <div id="toggle-button" class="toggle-button">
+        <span>&#x25C0;</span> <!-- Left arrow to collapse -->
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="/productsTable">Products</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/usersTable">Users</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/ordersTable">Orders</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/contact-requests">Contact Requests</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/add-product">Add Product</a>
+        </li>
+    </ul>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('admin-sidebar');
+        const toggleButton = document.getElementById('toggle-button');
+        const container = document.querySelector('.container');
+        let isSidebarVisible = false;
+
+        toggleButton.addEventListener('click', function() {
+            isSidebarVisible = !isSidebarVisible;
+            if (isSidebarVisible) {
+                sidebar.classList.add('show');
+                container.classList.add('with-sidebar');
+                toggleButton.innerHTML = '<span>&#x25B6;</span>'; // Right arrow to collapse
+            } else {
+                sidebar.classList.remove('show');
+                container.classList.remove('with-sidebar');
+                toggleButton.innerHTML = '<span>&#x25C0;</span>'; // Left arrow to expand
+            }
+        });
+    });
+</script>

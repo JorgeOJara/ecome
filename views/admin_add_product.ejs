@@ -1,0 +1,126 @@
+<%- include('partials/header', { title: 'Add Product', cssFile: 'admin_add_product.css' }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mt-4">
+    <h2 class="text-center">Add New Product</h2>
+    
+    <!-- Success Modal -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success" role="alert">
+            Product added successfully!
+        </div>
+    <% } %>
+
+    <form action="/add-product" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Product Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="discount_amount">Discount Amount</label>
+            <input type="number" step="0.01" class="form-control" id="discount_amount" name="discount_amount">
+        </div>
+
+        <div class="form-group">
+            <label for="stock">Stock Quantity</label>
+            <input type="number" class="form-control" id="stock" name="stock" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" class="form-control" id="category" name="category" required>
+        </div>
+
+        <div class="form-group">
+            <label for="subcategory">Subcategory</label>
+            <input type="text" class="form-control" id="subcategory" name="subcategory">
+        </div>
+
+        <div class="form-group">
+            <label for="brand">Brand</label>
+            <input type="text" class="form-control" id="brand" name="brand">
+        </div>
+
+        <div class="form-group">
+            <label for="model">Model</label>
+            <input type="text" class="form-control" id="model" name="model">
+        </div>
+
+        <div class="form-group">
+            <label for="sku">SKU</label>
+            <input type="text" class="form-control" id="sku" name="sku" required>
+        </div>
+
+        <div class="form-group">
+            <label for="weight">Weight (in kg)</label>
+            <input type="number" step="0.01" class="form-control" id="weight" name="weight">
+        </div>
+
+        <div class="form-group">
+            <label for="dimensions">Dimensions (L x W x H)</label>
+            <input type="text" class="form-control" id="dimensions" name="dimensions">
+        </div>
+
+        <div class="form-group">
+            <label for="color">Color</label>
+            <input type="text" class="form-control" id="color" name="color">
+        </div>
+
+        <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" class="form-control" id="size" name="size">
+        </div>
+
+        <div class="form-group">
+            <label for="material">Material</label>
+            <input type="text" class="form-control" id="material" name="material">
+        </div>
+
+        <div class="form-group">
+            <label for="release_date">Release Date</label>
+            <input type="date" class="form-control" id="release_date" name="release_date">
+        </div>
+
+        <div class="form-group">
+            <label for="warranty">Warranty</label>
+            <input type="text" class="form-control" id="warranty" name="warranty">
+        </div>
+
+        <div class="form-group">
+            <label for="return_policy">Return Policy</label>
+            <textarea class="form-control" id="return_policy" name="return_policy" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="additional_info">Additional Information</label>
+            <textarea class="form-control" id="additional_info" name="additional_info" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="images">Upload Images (1-3 max)</label>
+            <input type="file" class="form-control-file" id="images" name="images" accept="image/*" multiple required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Add Product</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

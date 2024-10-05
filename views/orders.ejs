@@ -1,0 +1,118 @@
+<%- include('partials/header', { title: 'Orders Table' }) %>
+
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mx-auto my-8">
+    <h2 class="text-center text-2xl font-bold mb-6">Orders</h2>
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">Order ID</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">User ID</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">Status</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">Subtotal</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">Total</th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-700">Created At</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <% orders.forEach(function(order, index) { %>
+                <!-- Main row that will be clicked -->
+                <tr class="cursor-pointer hover:bg-gray-100 toggle-order" data-target="#orderDetails-<%= index %>">
+                    <td class="px-4 py-3"><%= order.order_id %></td>
+                    <td class="px-4 py-3"><%= order.user_id %></td>
+                    <td class="px-4 py-3"><%= order.status %></td>
+                    <td class="px-4 py-3">$<%= order.subtotal.toFixed(2) %></td>
+                    <td class="px-4 py-3">$<%= order.total.toFixed(2) %></td>
+                    <td class="px-4 py-3"><%= new Date(order.createdAt).toLocaleString() %></td>
+                </tr>
+
+                <!-- Collapsible row for order items -->
+                <tr id="orderDetails-<%= index %>" class="hidden">
+                    <td colspan="6" class="px-4 py-3">
+                        <table class="min-w-full bg-gray-50 border border-gray-200 text-sm">
+                            <thead class="bg-gray-200">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Product ID</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Name</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Quantity</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Price</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Category</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-600">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <% let cartItems = JSON.parse(order.cartData); %>
+                                <% cartItems.forEach(function(item) { %>
+                                    <% let productDetails = products.find(p => p.product_id == item.product_id); %>
+                                    <% if (productDetails) { %>
+                                        <tr class="cursor-pointer hover:bg-gray-100 toggle-product" data-target="#productDetails-<%= index %>-<%= item.product_id %>">
+                                            <td class="px-4 py-2"><%= item.product_id %></td>
+                                            <td class="px-4 py-2"><%= productDetails.name %></td>
+                                            <td class="px-4 py-2"><%= item.quantity %></td>
+                                            <td class="px-4 py-2">$<%= productDetails.price.toFixed(2) %></td>
+                                            <td class="px-4 py-2"><%= productDetails.category %></td>
+                                            <td class="px-4 py-2">
+                                                <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Details</button>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Collapsible row for product details -->
+                                        <tr id="productDetails-<%= index %>-<%= item.product_id %>" class="hidden">
+                                            <td colspan="6" class="px-4 py-2">
+                                                <table class="w-full bg-gray-50 border border-gray-200 text-sm">
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Description:</th>
+                                                        <td class="px-4 py-2"><%= productDetails.description || 'N/A' %></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Brand:</th>
+                                                        <td class="px-4 py-2"><%= productDetails.brand || 'N/A' %></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Model:</th>
+                                                        <td class="px-4 py-2"><%= productDetails.model || 'N/A' %></td>
+                                                    </tr>
+                                                    <!-- Additional details as necessary -->
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="6" class="px-4 py-2 text-center text-gray-600">Product details not found</td>
+                                        </tr>
+                                    <% } %>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JavaScript to toggle visibility -->
+<script>
+    // Toggling order details
+    document.querySelectorAll('.toggle-order').forEach(row => {
+        row.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetElement = document.querySelector(targetId);
+            targetElement.classList.toggle('hidden');
+        });
+    });
+
+    // Toggling product details
+    document.querySelectorAll('.toggle-product').forEach(row => {
+        row.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const targetElement = document.querySelector(targetId);
+            targetElement.classList.toggle('hidden');
+        });
+    });
+</script>

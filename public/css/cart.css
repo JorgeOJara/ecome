@@ -1,0 +1,83 @@
+      body {
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+h2 {
+    font-weight: bold;
+}
+
+.cart-item {
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product-code, .product-status {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.product-status {
+    margin-top: 10px;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+}
+
+.quantity input {
+    width: 60px;
+    text-align: center;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.form-control {
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #6c757d;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.btn-primary:hover {
+    background-color: #5a6268;
+}
+
+.btn-checkout {
+    background-color: #28a745;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.btn-checkout:hover {
+    background-color: #218838;
+}
