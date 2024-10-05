@@ -26,4 +26,4 @@ RUN rm -rf node_modules package-lock.json && \
 EXPOSE 3000
 
 # Start the application using Node.js
-CMD ["npm", "start"]
+CMD ["node", "index.js"]
