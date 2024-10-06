@@ -9,9 +9,9 @@ services:
       - "80:80"  # Expose the app port
     environment:
       MYSQL_HOST: mysql
-      MYSQL_USER: root
-      MYSQL_PASSWORD: "&7yS@X3RzP9#qL2$mW!8ZbF^"
-      MYSQL_DATABASE: ecome_db
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     depends_on:
       - mysql
     restart: always
@@ -19,8 +19,8 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Use this to set the root password
-      MYSQL_DATABASE: ecome_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # Use environment variable for the root password
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "3306:3306"  # Expose MySQL port
     volumes:
