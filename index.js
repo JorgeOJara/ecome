@@ -181,6 +181,7 @@ app.post('/checkout', isAuthenticated, async (req, res) => {
     }
 });
 
+
 // Confirm order (Simulated payment) - Route
 app.post('/confirmOrder', isAuthenticated, async (req, res) => {
     const { cartData, userId, subtotal, taxes, shipping, total } = req.body;
