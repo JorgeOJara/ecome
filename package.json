@@ -11,8 +11,7 @@
     "express": "^4.18.2",
     "bcryptjs": "^2.4.3",
     "express-session": "^1.17.3",
-    "sqlite3": "^5.0.11",
-    "connect-sqlite3": "*",
+    "mysql2": "^2.3.3",  
     "multer": "^1.4.5-lts.1",
     "ejs": "*",
     "dotenv": "^16.0.0"  
