@@ -12,7 +12,7 @@ RUN apt-get update && \
 # Set the working directory inside the container
 WORKDIR /app/
 
-# Copy the current directory's contents to the /app directory in the container
+# Copy the current directory contents to the /app directory in the container
 COPY . .
 
 # Update npm to 10.9.0 globally before running project npm install

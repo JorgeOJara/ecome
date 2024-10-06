@@ -6,12 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"  # Expose the app port
+      - "80:80"  # Map container's port 80 to host's port 80
     environment:
       MYSQL_HOST: mysql
       MYSQL_USER: root
-      MYSQL_PASSWORD: "&7yS@X3RzP9#qL2$mW!8ZbF^"  # Wrapped in quotes
+      MYSQL_PASSWORD: "&7yS@X3RzP9#qL2$mW!8ZbF^"
       MYSQL_DATABASE: ecome_db
+      PORT: 80  # Set the PORT environment variable to 80 for the container
     depends_on:
       - mysql
     restart: always
@@ -22,7 +23,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: ecome_db
       MYSQL_USER: root
-      MYSQL_PASSWORD: "&7yS@X3RzP9#qL2$mW!8ZbF^"  # Wrapped in quotes
+      MYSQL_PASSWORD: "&7yS@X3RzP9#qL2$mW!8ZbF^"
     ports:
       - "3306:3306"  # Expose MySQL port
     volumes:
