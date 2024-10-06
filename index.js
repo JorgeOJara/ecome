@@ -11,7 +11,7 @@ const multer = require('multer');
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST || 'localhost',
     user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD ,
+    password: process.env.MYSQL_PASSWORD || 'rootpassword',
     database: process.env.MYSQL_DATABASE || 'ecome_db'
 });
 
@@ -300,6 +300,20 @@ app.post('/updateSlide', isAuthenticated, async (req, res) => {
         res.status(500).send('Error updating slide');
     }
 });
+
+app.get('/products', async (req, res) => {
+    try {
+        // Fetch all products from the database
+        const [rows] = await db.query('SELECT * FROM products');
+        
+        // Render the products page and pass the retrieved products
+        res.render('products', { cssFile: 'products.css', products: rows, user: req.session.user });
+    } catch (err) {
+        console.error('Error fetching products:', err.message);
+        res.status(500).send('Error fetching products');
+    }
+});
+
 
 // Admin - Display all products
 app.get('/productsTable', isAuthenticated, async (req, res) => {
