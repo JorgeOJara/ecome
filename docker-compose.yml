@@ -1,4 +1,4 @@
-xversion: '3.8'
+version: '3.8'  # This specifies the correct version of Docker Compose
 
 services:
   app:
