@@ -15,6 +15,67 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE || 'ecome_db'
 });
 
+
+//////////////////////////////////
+ ////// make the admin user //////
+//////////////////////////////////
+
+
+// Function to check if the admin user exists
+function checkAdminUserExists(callback) {
+    pool.query('SELECT * FROM users WHERE username = ?', ['admin'], (err, rows) => {
+        if (err) {
+            console.error('Error checking if admin user exists:', err.message);
+            return callback(false); // Return false if there's an error
+        }
+        return callback(rows.length > 0); // Return true if admin user exists
+    });
+}
+
+// Function to create the admin user
+function createAdminUser() {
+    const adminPassword = process.env.MYSQL_PASSWORD;
+
+    // Hash the admin password using bcryptjs
+    bcrypt.hash(adminPassword, 10, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error hashing admin password:', err.message);
+            return;
+        }
+
+        // Insert the admin user into the database
+        pool.query(`
+            INSERT INTO users (firstName, lastName, username, email, password, phone, address, role)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `, ['Admin', 'User', 'admin', 'admin@example.com', hashedPassword, '1234567890', 'Admin Address', 'admin'], (err, result) => {
+            if (err) {
+                console.error('Error creating admin user:', err.message);
+                return;
+            }
+            console.log('Admin user created successfully!');
+        });
+    });
+}
+
+// Main function to check for admin and create if needed
+function setupAdminUser() {
+    checkAdminUserExists((adminExists) => {
+        if (!adminExists) {
+            createAdminUser();
+        } else {
+            console.log('Admin user already exists. No need to create.');
+        }
+    });
+}
+
+// Call this function after your app starts and database is connected
+setupAdminUser();
+
+
+
+//////////// end of admin user creation  /////////
+
+
 // Promisify the pool's query method to use async/await
 const db = pool.promise();
 
