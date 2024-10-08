@@ -16,65 +16,6 @@ const pool = mysql.createPool({
 });
 
 
-//////////////////////////////////
- ////// make the admin user //////
-//////////////////////////////////
-
-
-// Function to check if the admin user exists
-function checkAdminUserExists(callback) {
-    pool.query('SELECT * FROM users WHERE username = ?', ['admin'], (err, rows) => {
-        if (err) {
-            console.error('Error checking if admin user exists:', err.message);
-            return callback(false); // Return false if there's an error
-        }
-        return callback(rows.length > 0); // Return true if admin user exists
-    });
-}
-
-// Function to create the admin user
-function createAdminUser() {
-    const adminPassword = process.env.MYSQL_PASSWORD;
-
-    // Hash the admin password using bcryptjs
-    bcrypt.hash(adminPassword, 10, (err, hashedPassword) => {
-        if (err) {
-            console.error('Error hashing admin password:', err.message);
-            return;
-        }
-
-        // Insert the admin user into the database
-        pool.query(`
-            INSERT INTO users (firstName, lastName, username, email, password, phone, address, role)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, ['Admin', 'User', 'admin', 'admin@example.com', hashedPassword, '1234567890', 'Admin Address', 'admin'], (err, result) => {
-            if (err) {
-                console.error('Error creating admin user:', err.message);
-                return;
-            }
-            console.log('Admin user created successfully!');
-        });
-    });
-}
-
-// Main function to check for admin and create if needed
-function setupAdminUser() {
-    checkAdminUserExists((adminExists) => {
-        if (!adminExists) {
-            createAdminUser();
-        } else {
-            console.log('Admin user already exists. No need to create.');
-        }
-    });
-}
-
-// Call this function after your app starts and database is connected
-setupAdminUser();
-
-
-
-//////////// end of admin user creation  /////////
-
 
 // Promisify the pool's query method to use async/await
 const db = pool.promise();
@@ -140,15 +81,25 @@ app.post('/register', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Check how many users exist to decide whether the user should be an admin
+        const [userCountRows] = await db.query('SELECT COUNT(*) as count FROM users');
+        const userCount = userCountRows[0].count;
+
+        // If the userCount is 0, make this user the admin
+        const role = userCount === 0 ? 'admin' : 'customer';
+
         await db.query(`INSERT INTO users (firstName, lastName, username, email, password, phone, address, role)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                       [firstName, lastName, username, email, hashedPassword, phone, address, 'customer']);
+                       [firstName, lastName, username, email, hashedPassword, phone, address, role]);
+
         res.redirect('/login');
     } catch (err) {
         console.error('Error registering user:', err.message);
         res.status(500).send('Error registering user');
     }
 });
+
 
 // Login route
 app.get('/login', (req, res) => {
