@@ -1,4 +1,4 @@
-version: '3.8'
+xversion: '3.8'
 
 services:
   app:
@@ -6,12 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"  # Expose the app port
+      - "80:80"
     environment:
       MYSQL_HOST: mysql
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
     depends_on:
       - mysql
     restart: always
@@ -19,12 +19,13 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}  # Use environment variable for the root password
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"  # Root password
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"            # Database name
     ports:
-      - "3306:3306"  # Expose MySQL port
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./dbFiles/db-setup.sql:/docker-entrypoint-initdb.d/db-setup.sql  # Mount your db-setup.sql script
     restart: always
 
 volumes:
