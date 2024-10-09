@@ -62,8 +62,8 @@
 <%- include('partials/footer') %>
 
 <script>
-    const currentUserId = "<%= user.id %>";
-
+    const currentUserId = "<%= user ? user.id : '' %>";
+    
     // Fetch cart and user data from localStorage
     let storedCartData = JSON.parse(localStorage.getItem('cartData')) || {};
     let cart = storedCartData.cart || {};
