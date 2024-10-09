@@ -1,60 +1,63 @@
 <%- include('partials/header', { title: 'Shopping Cart', cssFile: 'cart.css' }) %>
 
-<% if (user && user.role === 'admin') { %>
-    <%- include('partials/admin_sidebar') %>
-<% } %>
+<% if (!user) { %>
+    <div class="container mx-auto mt-4">
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+            <p class="font-bold">Not Logged In</p>
+            <p>You need to <a href="/login" class="underline text-blue-500">log in</a> to access your shopping cart.</p>
+        </div>
+    </div>
+<% } else { %>
+    <% if (user && user.role === 'admin') { %>
+        <%- include('partials/admin_sidebar') %>
+    <% } %>
 
-<div class="container mx-auto mt-4">
-    <!-- Cart Section -->
-    <div class="mt-5">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
-            <div class="md:col-span-2" id="cart-items">
-                <!-- Cart items will be inserted here by JavaScript -->
-            </div>
-            <div class="bg-white shadow-lg rounded-lg p-6">
-                <h4 class="text-lg font-bold mb-4">Estimate Shipping & Tax</h4>
-                <form>
-                    <div class="mb-4">
-                        <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
-                        <select id="country" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                            <option>United States</option>
-                            <!-- Add more countries as needed -->
-                        </select>
+    <div class="container mx-auto mt-4">
+        <!-- Cart Section -->
+        <div class="mt-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+                <div class="md:col-span-2" id="cart-items">
+                    <!-- Cart items will be inserted here by JavaScript -->
+                </div>
+                <div class="bg-white shadow-lg rounded-lg p-6">
+                    <h4 class="text-lg font-bold mb-4">Estimate Shipping & Tax</h4>
+                    <form>
+                        <div class="mb-4">
+                            <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                            <select id="country" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                                <option>United States</option>
+                                <!-- Add more countries as needed -->
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
+                            <input type="text" id="zip" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter Zip Code">
+                        </div>
+                    </form>
+                    <hr class="my-4">
+                    <div class="flex justify-between mb-2">
+                        <p class="text-sm">Subtotal:</p>
+                        <p id="subtotal" class="text-sm">$0.00</p>
                     </div>
-                    <div class="mb-4">
-                        <label for="zip" class="block text-sm font-medium text-gray-700">Zip Code</label>
-                        <input type="text" id="zip" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter Zip Code">
+                    <div class="flex justify-between mb-2">
+                        <p class="text-sm">Shipping:</p>
+                        <p class="text-sm">Calculate Above</p>
                     </div>
-                </form>
-                <hr class="my-4">
-                <div class="flex justify-between mb-2">
-                    <p class="text-sm">Subtotal:</p>
-                    <p id="subtotal" class="text-sm">$0.00</p>
+                    <div class="flex justify-between mb-2">
+                        <p class="text-sm">Sales Tax:</p>
+                        <p class="text-sm">Calculate Above</p>
+                    </div>
+                    <hr class="my-4">
+                    <div class="flex justify-between mb-4">
+                        <h5 class="font-bold">Total:</h5>
+                        <h5 id="total" class="font-bold">$0.00</h5>
+                    </div>
+                    <!-- Update the button -->
+                    <button id="checkout-btn" class="w-full bg-blue-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-50" disabled onclick="proceedToCheckout()">Proceed to Checkout</button>
                 </div>
-                <div class="flex justify-between mb-2">
-                    <p class="text-sm">Shipping:</p>
-                    <p class="text-sm">Calculate Above</p>
-                </div>
-                <div class="flex justify-between mb-2">
-                    <p class="text-sm">Sales Tax:</p>
-                    <p class="text-sm">Calculate Above</p>
-                </div>
-                <hr class="my-4">
-                <div class="flex justify-between mb-4">
-                    <h5 class="font-bold">Total:</h5>
-                    <h5 id="total" class="font-bold">$0.00</h5>
-                </div>
-                <!-- Update the button -->
-                <button id="checkout-btn" class="w-full bg-blue-500 text-white px-4 py-2 rounded-md cursor-not-allowed opacity-50" disabled onclick="proceedToCheckout()">Proceed to Checkout</button>
             </div>
         </div>
     </div>
-</div>
-</br>
-  </br>
-</br>
-</br>
-</br>
 
 <%- include('partials/footer') %>
 
@@ -103,7 +106,7 @@
             subtotal += itemTotal;
 
             const cartItemRow = `
-                <div class="cart-item bg-white rounded-lg p-6 mb-6 shadow-sm" style="box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1), -8px -8px 15px rgba(255, 255, 255, 0.7);">
+                <div class="cart-item bg-white rounded-lg p-6 mb-6 shadow-sm">
                     <div class="flex items-center space-x-6">
                         <div class="w-24">
                             <img src="https://via.placeholder.com/150" class="w-full h-auto rounded-lg" alt="${product.name}">
@@ -111,10 +114,10 @@
                         <div class="flex-1">
                             <h5 class="text-lg font-bold text-gray-800">${product.name}</h5>
                             <div class="flex justify-between items-center mt-4">
-                                <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-md shadow-inner" style="box-shadow: inset 3px 3px 6px rgba(0,0,0,0.1), inset -3px -3px 6px rgba(255,255,255,0.7);">
-                                    <button class="px-3 py-1 bg-white rounded-md shadow" style="box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1), -2px -2px 5px rgba(255, 255, 255, 0.7);" onclick="updateQuantity('${id}', -1)">-</button>
+                                <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-md">
+                                    <button class="px-3 py-1 bg-white rounded-md" onclick="updateQuantity('${id}', -1)">-</button>
                                     <span class="mx-4 text-gray-700 font-semibold">${product.quantity}</span>
-                                    <button class="px-3 py-1 bg-white rounded-md shadow" style="box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1), -2px -2px 5px rgba(255, 255, 255, 0.7);" onclick="updateQuantity('${id}', 1)">+</button>
+                                    <button class="px-3 py-1 bg-white rounded-md" onclick="updateQuantity('${id}', 1)">+</button>
                                 </div>
                                 <p class="text-sm text-gray-600 font-semibold">$${product.price.toFixed(2)}</p>
                                 <p class="text-sm text-gray-600 font-semibold">$${itemTotal.toFixed(2)}</p>
@@ -166,8 +169,4 @@
     document.addEventListener('DOMContentLoaded', updateCartDisplay);
 </script>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrap.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+<%- include('partials/footer') %>
