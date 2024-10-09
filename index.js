@@ -165,8 +165,12 @@ app.get('/product/:id', async (req, res) => {
 
 // Cart route
 app.get('/cart', (req, res) => {
-    res.render('cart', { cssFile: 'cart.css' });
+    res.render('cart', { 
+        cssFile: 'cart.css', 
+        user: req.session.user // Pass the user object to the template
+    });
 });
+
 
 // Checkout route
 app.get('/checkout', (req, res) => {
