@@ -28,7 +28,6 @@
                     <td class="px-4 py-3">$<%= (parseFloat(order.subtotal) || 0).toFixed(2) %></td>
                     <td class="px-4 py-3">$<%= (parseFloat(order.total) || 0).toFixed(2) %></td>
                     <td class="px-4 py-3"><%= new Date(order.createdAt).toLocaleString() %></td>
-                    
                 </tr>
 
                 <!-- Collapsible row for order items -->
@@ -46,47 +45,55 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
-                                <% let cartItems = JSON.parse(order.cartData); %>
-                                <% cartItems.forEach(function(item) { %>
-                                    <% let productDetails = products.find(p => p.product_id == item.product_id); %>
-                                    <% if (productDetails) { %>
-                                        <tr class="cursor-pointer hover:bg-gray-100 toggle-product" data-target="#productDetails-<%= index %>-<%= item.product_id %>">
-                                            <td class="px-4 py-2"><%= item.product_id %></td>
-                                            <td class="px-4 py-2"><%= productDetails.name %></td>
-                                            <td class="px-4 py-2"><%= item.quantity %></td>
-                                            <td class="px-4 py-2">$<%= productDetails.price.toFixed(2) %></td>
-                                            <td class="px-4 py-2"><%= productDetails.category %></td>
-                                            <td class="px-4 py-2">
-                                                <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Details</button>
-                                            </td>
-                                        </tr>
+                                <% let cartItems = []; %>
+                                <% try { cartItems = JSON.parse(order.cartData); } catch (e) { console.error('Invalid cartData', order.cartData); } %>
 
-                                        <!-- Collapsible row for product details -->
-                                        <tr id="productDetails-<%= index %>-<%= item.product_id %>" class="hidden">
-                                            <td colspan="6" class="px-4 py-2">
-                                                <table class="w-full bg-gray-50 border border-gray-200 text-sm">
-                                                    <tr>
-                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Description:</th>
-                                                        <td class="px-4 py-2"><%= productDetails.description || 'N/A' %></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Brand:</th>
-                                                        <td class="px-4 py-2"><%= productDetails.brand || 'N/A' %></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="px-4 py-2 text-left font-medium text-gray-600">Model:</th>
-                                                        <td class="px-4 py-2"><%= productDetails.model || 'N/A' %></td>
-                                                    </tr>
-                                                    <!-- Additional details as necessary -->
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="6" class="px-4 py-2 text-center text-gray-600">Product details not found</td>
-                                        </tr>
-                                    <% } %>
-                                <% }); %>
+                                <% if (Array.isArray(cartItems)) { %>
+                                    <% cartItems.forEach(function(item) { %>
+                                        <% let productDetails = products.find(p => p.product_id == item.product_id); %>
+                                        <% if (productDetails) { %>
+                                            <tr class="cursor-pointer hover:bg-gray-100 toggle-product" data-target="#productDetails-<%= index %>-<%= item.product_id %>">
+                                                <td class="px-4 py-2"><%= item.product_id %></td>
+                                                <td class="px-4 py-2"><%= productDetails.name %></td>
+                                                <td class="px-4 py-2"><%= item.quantity %></td>
+                                                <td class="px-4 py-2">$<%= productDetails.price.toFixed(2) %></td>
+                                                <td class="px-4 py-2"><%= productDetails.category %></td>
+                                                <td class="px-4 py-2">
+                                                    <button class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Details</button>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Collapsible row for product details -->
+                                            <tr id="productDetails-<%= index %>-<%= item.product_id %>" class="hidden">
+                                                <td colspan="6" class="px-4 py-2">
+                                                    <table class="w-full bg-gray-50 border border-gray-200 text-sm">
+                                                        <tr>
+                                                            <th class="px-4 py-2 text-left font-medium text-gray-600">Description:</th>
+                                                            <td class="px-4 py-2"><%= productDetails.description || 'N/A' %></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="px-4 py-2 text-left font-medium text-gray-600">Brand:</th>
+                                                            <td class="px-4 py-2"><%= productDetails.brand || 'N/A' %></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="px-4 py-2 text-left font-medium text-gray-600">Model:</th>
+                                                            <td class="px-4 py-2"><%= productDetails.model || 'N/A' %></td>
+                                                        </tr>
+                                                        <!-- Additional details as necessary -->
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="px-4 py-2 text-center text-gray-600">Product details not found</td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="px-4 py-2 text-center text-gray-600">Invalid cart data</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </td>
