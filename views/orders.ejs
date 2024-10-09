@@ -25,9 +25,10 @@
                     <td class="px-4 py-3"><%= order.order_id %></td>
                     <td class="px-4 py-3"><%= order.user_id %></td>
                     <td class="px-4 py-3"><%= order.status %></td>
-                    <td class="px-4 py-3">$<%= order.subtotal.toFixed(2) %></td>
-                    <td class="px-4 py-3">$<%= order.total.toFixed(2) %></td>
+                    <td class="px-4 py-3">$<%= (parseFloat(order.subtotal) || 0).toFixed(2) %></td>
+                    <td class="px-4 py-3">$<%= (parseFloat(order.total) || 0).toFixed(2) %></td>
                     <td class="px-4 py-3"><%= new Date(order.createdAt).toLocaleString() %></td>
+                    
                 </tr>
 
                 <!-- Collapsible row for order items -->
