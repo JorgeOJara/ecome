@@ -75,8 +75,8 @@
                                     <td class="border-b px-4 py-2"><%= order.order_id %></td>
                                     <td class="border-b px-4 py-2"><%= order.status %></td>
                                     <td class="border-b px-4 py-2"><%= new Date(order.createdAt).toLocaleString() %></td>
-                                 
-                                    <td class="border-b px-4 py-2">$<%= order.total.toFixed(2) %></td>
+                                
+                                    <td class="border-b px-4 py-2">$<%= (parseFloat(order.total) || 0).toFixed(2) %></td>
                                 </tr>
                                 <% }) %>
                             </tbody>
