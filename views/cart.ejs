@@ -58,11 +58,16 @@
             </div>
         </div>
     </div>
+<% } %>
 
 <%- include('partials/footer') %>
 
 <script>
-    const currentUserId = "<%= user ? user.id : '' %>";
+    <% if (user) { %>
+        const currentUserId = "<%= user.id %>";
+    <% } else { %>
+        const currentUserId = '';
+    <% } %>
     
     // Fetch cart and user data from localStorage
     let storedCartData = JSON.parse(localStorage.getItem('cartData')) || {};
@@ -70,7 +75,7 @@
     let storedUserId = storedCartData.userId;
 
     // Check if cart belongs to the current user
-    if (storedUserId !== currentUserId) {
+    if (storedUserId !== currentUserId && currentUserId) {
         cart = {};
         localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
     }
