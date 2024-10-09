@@ -58,8 +58,8 @@
                             <td><%= product.product_id %></td>
                             <td><%= product.name %></td>
                             <td><%= product.description %></td>
-                            <td>$<%= product.price.toFixed(2) %></td>
-                            <td>$<%= product.discount_amount.toFixed(2) %></td>
+                            <td>$<%= (parseFloat(product.price) || 0).toFixed(2) %></td>
+                            <td>$<%= (parseFloat(product.discount_amount) || 0).toFixed(2) %></td>
                             <td><%= product.stock %></td>
                             <td><%= product.category %></td>
                         </tr>
