@@ -4,6 +4,12 @@
     <%- include('partials/admin_sidebar') %>
 <% } %>
 
+<script>
+    // This script logs each product to the browser console
+    const productsFromServer = <%- JSON.stringify(products) %>;
+    console.log('Products from server:', productsFromServer);
+</script>
+
 <div class="container mt-4">
     <!-- Products Section -->
     <div class="mt-5">
@@ -11,7 +17,10 @@
             <% products.forEach(product => { %>
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
-                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product Image">
+                        <!-- Check if the product has images, otherwise show a placeholder -->
+                        <img src="<%= product.images && product.images.length > 0 ? '/uploads/' + product.images[0] : 'https://via.placeholder.com/150' %>" 
+                             class="card-img-top" alt="<%= product.name %>" 
+                             style="width:100%; height:auto;">
                         <div class="card-body">
                             <h5 class="card-title"><%= product.name %></h5>
                             <p class="card-text">$<%= (parseFloat(product.price) || 0).toFixed(2) %></p>

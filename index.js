@@ -76,15 +76,28 @@ function isAuthenticated(req, res, next) {
 ////shop route
 app.get('/products', async (req, res) => {
     try {
-        const [products] = await db.query('SELECT * FROM products');
+        // Fetch products and their corresponding images
+        const [products] = await db.query(`
+            SELECT p.*, GROUP_CONCAT(pi.image_path) AS images
+            FROM products p
+            LEFT JOIN product_images pi ON p.product_id = pi.product_id
+            GROUP BY p.product_id
+        `);
         
-        // Render the products EJS view and pass the retrieved products
-        res.render('products', { products, user: req.session.user });
+        // Map the products and split their image paths into arrays
+        const productsWithImages = products.map(product => {
+            product.images = product.images ? product.images.split(',') : []; // Split the concatenated image paths into an array
+            return product;
+        });
+
+        // Render the products view and pass the products with their images
+        res.render('products', { products: productsWithImages, user: req.session.user });
     } catch (err) {
-        console.error('Error fetching products:', err.message);
-        res.status(500).send('Error fetching products');
+        console.error('Error fetching products and images:', err.message);
+        res.status(500).send('Error fetching products and images');
     }
 });
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -285,14 +298,32 @@ app.post('/login', async (req, res) => {
 // Home route
 app.get('/', async (req, res) => {
     try {
+        // Fetch the slideshow data
         const [slideshow] = await db.query('SELECT * FROM slideshow ORDER BY position LIMIT 3');
-        const [products] = await db.query('SELECT * FROM products ORDER BY created_at DESC');
-        res.render('index', { slideshow, products });
+
+        // Fetch the products along with their images
+        const [products] = await db.query(`
+            SELECT p.*, GROUP_CONCAT(pi.image_path) AS images
+            FROM products p
+            LEFT JOIN product_images pi ON p.product_id = pi.product_id
+            GROUP BY p.product_id
+            ORDER BY p.created_at DESC
+        `);
+
+        // Render the index page, passing slideshow and products (with images)
+        res.render('index', {
+            slideshow,
+            products: products.map(product => ({
+                ...product,
+                images: product.images ? product.images.split(',') : [] // Convert image paths to array
+            }))
+        });
     } catch (err) {
         console.error('Error fetching data:', err.message);
         res.status(500).send('Error fetching data');
     }
 });
+
 
 
 // Product details route
@@ -415,6 +446,18 @@ app.post('/updateSlide', isAuthenticated, async (req, res) => {
     }
 });
 
+
+// Admin - Show the Add Product form
+app.get('/add-product', isAuthenticated, (req, res) => {
+    if (req.session.user.role !== 'admin') {
+        return res.status(403).send('Access denied. Admins only.');
+    }
+
+    // Render the form for adding a new product
+    res.render('admin_add_product', { cssFile: 'admin_add_product.css' });
+});
+
+
 // Admin - Add new product POST handler
 app.post('/add-product', upload, isAuthenticated, async (req, res) => {
     const {
@@ -443,6 +486,8 @@ app.post('/add-product', upload, isAuthenticated, async (req, res) => {
         res.status(500).send('Error adding product');
     }
 });
+
+
 
 // Admin - Display all products
 app.get('/productsTable', isAuthenticated, async (req, res) => {
