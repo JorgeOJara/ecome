@@ -18,7 +18,7 @@
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
                         <!-- Check if the product has images, otherwise show a placeholder -->
-                        <img src="<%= product.images && product.images.length > 0 ? '/uploads/' + product.images[0] : 'https://via.placeholder.com/150' %>" 
+                        <img src="<%= product.images && product.images.length > 0 ? '/images/' + product.images[0] : 'https://via.placeholder.com/150' %>" 
                              class="card-img-top" alt="<%= product.name %>" 
                              style="width:100%; height:auto;">
                         <div class="card-body">

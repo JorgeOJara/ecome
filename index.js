@@ -112,13 +112,24 @@ app.get('/api/cart', isAuthenticated, async (req, res) => {
 
     try {
         const [cartItems] = await db.query(`
-            SELECT c.cart_id, c.quantity, p.name, p.price, p.product_id
+            SELECT c.cart_id, c.quantity, p.name, p.price, p.product_id, 
+                   GROUP_CONCAT(pi.image_path) AS images
             FROM cart c
             JOIN products p ON c.product_id = p.product_id
+            LEFT JOIN product_images pi ON p.product_id = pi.product_id
             WHERE c.user_id = ?
+            GROUP BY c.cart_id, p.product_id
         `, [user_id]);
 
-        res.json(cartItems);  // Return cart items as JSON
+        // Ensure images are returned as arrays
+        const cartItemsWithImages = cartItems.map(item => {
+            return {
+                ...item,
+                images: item.images ? item.images.split(',') : [] // Convert image paths to an array
+            };
+        });
+
+        res.json(cartItemsWithImages);  // Return cart items with images as JSON
     } catch (err) {
         console.error('Error fetching cart items:', err);
         res.status(500).json({ error: 'Failed to fetch cart items' });
@@ -498,6 +509,8 @@ app.post('/add-product', upload, isAuthenticated, async (req, res) => {
 
 
 
+
+
 // Admin - Display all products
 app.get('/productsTable', isAuthenticated, async (req, res) => {
     if (req.session.user.role !== 'admin') {
@@ -512,6 +525,99 @@ app.get('/productsTable', isAuthenticated, async (req, res) => {
         res.status(500).send('Error fetching products');
     }
 });
+
+// Route to fetch product details for editing
+app.get('/edit-product/:id', isAuthenticated, async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+        const [rows] = await db.query('SELECT * FROM products WHERE product_id = ?', [productId]);
+        const product = rows[0];
+
+        if (!product) {
+            return res.status(404).send('Product not found');
+        }
+
+        const [images] = await db.query('SELECT image_path FROM product_images WHERE product_id = ?', [productId]);
+
+        // Pass product and images to the edit form
+        res.render('edit_product', { product, images, user: req.session.user });
+    } catch (err) {
+        console.error('Error fetching product details:', err.message);
+        res.status(500).send('Error fetching product details');
+    }
+});
+
+
+// Route to handle updating a product
+app.post('/edit-product/:id', upload, isAuthenticated, async (req, res) => {
+    const productId = req.params.id;
+    const {
+        name, description, price, discount_amount, stock, category, subcategory, brand, model,
+        sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info
+    } = req.body;
+
+    const images = req.files.map(file => file.filename);
+
+    try {
+        // Create an object with the updated fields (if they have values)
+        const updateFields = {};
+        if (name) updateFields.name = name;
+        if (description) updateFields.description = description;
+        if (price) updateFields.price = price;
+        if (discount_amount) updateFields.discount_amount = discount_amount;
+        if (stock) updateFields.stock = stock;
+        if (category) updateFields.category = category;
+        if (subcategory) updateFields.subcategory = subcategory;
+        if (brand) updateFields.brand = brand;
+        if (model) updateFields.model = model;
+        if (sku) updateFields.sku = sku;
+        if (weight) updateFields.weight = weight;
+        if (dimensions) updateFields.dimensions = dimensions;
+        if (color) updateFields.color = color;
+        if (size) updateFields.size = size;
+        if (material) updateFields.material = material;
+        if (release_date) updateFields.release_date = release_date || null;  // Allow release_date to be null if empty
+        if (warranty) updateFields.warranty = warranty;
+        if (return_policy) updateFields.return_policy = return_policy;
+        if (additional_info) updateFields.additional_info = additional_info;
+
+        // Dynamically construct the query
+        const fieldsToUpdate = Object.keys(updateFields).map(field => `${field} = ?`).join(', ');
+        const valuesToUpdate = Object.values(updateFields);
+
+        // Update the product if there are fields to update
+        if (fieldsToUpdate) {
+            await db.query(`
+                UPDATE products 
+                SET ${fieldsToUpdate}
+                WHERE product_id = ?`, 
+                [...valuesToUpdate, productId]
+            );
+        }
+
+        // Handle new images if provided
+        if (images.length > 0) {
+            // Delete old images
+            await db.query('DELETE FROM product_images WHERE product_id = ?', [productId]);
+
+            // Insert new images
+            for (const image of images) {
+                await db.query('INSERT INTO product_images (product_id, image_path) VALUES (?, ?)', [productId, image]);
+            }
+        }
+
+        res.redirect('/products');
+    } catch (err) {
+        console.error('Error updating product:', err.message);
+        res.status(500).send('Error updating product');
+    }
+});
+
+
+
+
+
 
 // Admin - Display all users
 app.get('/usersTable', isAuthenticated, async (req, res) => {

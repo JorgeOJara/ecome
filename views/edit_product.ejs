@@ -1,93 +1,143 @@
-<%- include('partials/header', { title: 'Edit Product', cssFile: 'edit_product.css' }) %>
+<%- include('partials/header', { title: 'Edit Product', cssFile: 'admin_add_product.css' }) %>
 
-<div class="container mt-4">
-    <h2 class="text-center">Edit Product</h2>
-    
+<% if (user && user.role === 'admin') { %>
+    <%- include('partials/admin_sidebar') %>
+<% } %>
+
+<div class="container mx-auto mt-4">
+    <h2 class="text-center text-2xl font-semibold mb-6">Edit Product</h2>
+
+    <!-- Success Message (Optional) -->
     <% if (typeof success !== 'undefined' && success) { %>
-        <div class="alert alert-success" role="alert">
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
             Product updated successfully!
         </div>
     <% } %>
-    
-    <form action="/products/<%= product.product_id %>/edit" method="POST">
-        <div class="form-group">
-            <label for="name">Product Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
+
+    <form action="/edit-product/<%= product.product_id %>" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+            <input type="text" id="name" name="name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.name %>" required>
         </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3"><%= product.description %></textarea>
+
+        <div>
+            <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+            <input type="number" step="0.01" id="price" name="price" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.price %>" required>
         </div>
-        <div class="form-group">
-            <label for="price">Price</label>
-            <input type="number" class="form-control" id="price" name="price" step="0.01" value="<%= product.price %>" required>
+
+        <div>
+            <label for="discount_amount" class="block text-sm font-medium text-gray-700">Discount Amount</label>
+            <input type="number" step="0.01" id="discount_amount" name="discount_amount" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.discount_amount %>">
         </div>
-        <div class="form-group">
-            <label for="discount_amount">Discount Amount</label>
-            <input type="number" class="form-control" id="discount_amount" name="discount_amount" step="0.01" value="<%= product.discount_amount %>">
+
+        <div>
+            <label for="stock" class="block text-sm font-medium text-gray-700">Stock Quantity</label>
+            <input type="number" id="stock" name="stock" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.stock %>" required>
         </div>
-        <div class="form-group">
-            <label for="stock">Stock Quantity</label>
-            <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>">
+
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+            <input type="text" id="category" name="category" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.category %>" required>
         </div>
-        <div class="form-group">
-            <label for="category">Category</label>
-            <input type="text" class="form-control" id="category" name="category" value="<%= product.category %>" required>
+
+        <div>
+            <label for="subcategory" class="block text-sm font-medium text-gray-700">Subcategory</label>
+            <input type="text" id="subcategory" name="subcategory" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.subcategory %>">
         </div>
-        <div class="form-group">
-            <label for="subcategory">Subcategory</label>
-            <input type="text" class="form-control" id="subcategory" name="subcategory" value="<%= product.subcategory %>">
+
+        <div>
+            <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
+            <input type="text" id="brand" name="brand" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.brand %>">
         </div>
-        <div class="form-group">
-            <label for="brand">Brand</label>
-            <input type="text" class="form-control" id="brand" name="brand" value="<%= product.brand %>">
+
+        <div>
+            <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
+            <input type="text" id="model" name="model" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.model %>">
         </div>
-        <div class="form-group">
-            <label for="model">Model</label>
-            <input type="text" class="form-control" id="model" name="model" value="<%= product.model %>">
+
+        <div>
+            <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+            <input type="text" id="sku" name="sku" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.sku %>" required>
         </div>
-        <div class="form-group">
-            <label for="sku">SKU</label>
-            <input type="text" class="form-control" id="sku" name="sku" value="<%= product.sku %>">
+
+        <div>
+            <label for="weight" class="block text-sm font-medium text-gray-700">Weight (in kg)</label>
+            <input type="number" step="0.01" id="weight" name="weight" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.weight %>">
         </div>
-        <div class="form-group">
-            <label for="weight">Weight</label>
-            <input type="number" class="form-control" id="weight" name="weight" step="0.01" value="<%= product.weight %>">
+
+        <div>
+            <label for="dimensions" class="block text-sm font-medium text-gray-700">Dimensions (L x W x H)</label>
+            <input type="text" id="dimensions" name="dimensions" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.dimensions %>">
         </div>
-        <div class="form-group">
-            <label for="dimensions">Dimensions</label>
-            <input type="text" class="form-control" id="dimensions" name="dimensions" value="<%= product.dimensions %>">
+
+        <div>
+            <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
+            <input type="text" id="color" name="color" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.color %>">
         </div>
-        <div class="form-group">
-            <label for="color">Color</label>
-            <input type="text" class="form-control" id="color" name="color" value="<%= product.color %>">
+
+        <div>
+            <label for="size" class="block text-sm font-medium text-gray-700">Size</label>
+            <input type="text" id="size" name="size" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.size %>">
         </div>
-        <div class="form-group">
-            <label for="size">Size</label>
-            <input type="text" class="form-control" id="size" name="size" value="<%= product.size %>">
+
+        <div>
+            <label for="material" class="block text-sm font-medium text-gray-700">Material</label>
+            <input type="text" id="material" name="material" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.material %>">
         </div>
-        <div class="form-group">
-            <label for="material">Material</label>
-            <input type="text" class="form-control" id="material" name="material" value="<%= product.material %>">
+
+        <div>
+            <label for="release_date" class="block text-sm font-medium text-gray-700">Release Date</label>
+            <input type="date" id="release_date" name="release_date" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.release_date %>">
         </div>
-        <div class="form-group">
-            <label for="release_date">Release Date</label>
-            <input type="date" class="form-control" id="release_date" name="release_date" value="<%= product.release_date %>">
+
+        <div>
+            <label for="warranty" class="block text-sm font-medium text-gray-700">Warranty</label>
+            <input type="text" id="warranty" name="warranty" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" value="<%= product.warranty %>">
         </div>
-        <div class="form-group">
-            <label for="warranty">Warranty</label>
-            <textarea class="form-control" id="warranty" name="warranty" rows="2"><%= product.warranty %></textarea>
+
+        <div class="md:col-span-4">
+            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="3" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><%= product.description %></textarea>
         </div>
-        <div class="form-group">
-            <label for="return_policy">Return Policy</label>
-            <textarea class="form-control" id="return_policy" name="return_policy" rows="2"><%= product.return_policy %></textarea>
+
+        <div class="md:col-span-4">
+            <label for="return_policy" class="block text-sm font-medium text-gray-700">Return Policy</label>
+            <textarea id="return_policy" name="return_policy" rows="2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><%= product.return_policy %></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Update Product</button>
+
+        <div class="md:col-span-4">
+            <label for="additional_info" class="block text-sm font-medium text-gray-700">Additional Information</label>
+            <textarea id="additional_info" name="additional_info" rows="2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"><%= product.additional_info %></textarea>
+        </div>
+
+        <!-- Display current product images -->
+        <div class="md:col-span-4">
+            <label class="block text-sm font-medium text-gray-700">Current Images</label>
+            <div class="mt-2 flex">
+                <% images.forEach(image => { %>
+                    <img src="/images/<%= image.image_path %>" alt="Product Image" class="mr-2" style="width: 100px; height: 100px;">
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- Upload new images -->
+        <div class="md:col-span-4">
+            <label for="images" class="block text-sm font-medium text-gray-700">Upload New Images (optional)</label>
+            <input type="file" id="images" name="images" accept="image/*" multiple class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+        </div>
+
+        <div class="md:col-span-4">
+            <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-md mt-4">Update Product</button>
+        </div>
     </form>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<%- include('partials/footer') %>
+
+<!-- Include jQuery and Bootstrap JS for modal functionality if needed -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

@@ -35,7 +35,7 @@
     <% if (user && user.role === 'admin') { %>
         <%- include('partials/admin_sidebar') %>
     <% } %>
-    
+
     <div class="container mt-5">
         <h1 class="text-center">Products List</h1>
 
@@ -54,7 +54,7 @@
                 </thead>
                 <tbody>
                     <% products.forEach(function(product) { %>
-                        <tr class="clickable-row" data-href="/products/<%= product.product_id %>">
+                        <tr class="clickable-row" data-href="/edit-product/<%= product.product_id %>">
                             <td><%= product.product_id %></td>
                             <td><%= product.name %></td>
                             <td><%= product.description %></td>

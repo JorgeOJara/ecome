@@ -87,11 +87,15 @@
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
 
+                const productImage = item.images && item.images.length > 0 
+                    ? `/images/${item.images[0]}` 
+                    : 'https://via.placeholder.com/150';
+
                 const cartItemRow = `
                     <div class="cart-item mb-6 p-4 bg-white rounded-lg shadow-sm" style="box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1), -8px -8px 15px rgba(255, 255, 255, 0.7);">
                         <div class="flex items-center space-x-6">
                             <div class="w-24">
-                                <img src="https://via.placeholder.com/150" class="w-full h-auto rounded-lg" alt="${item.name}">
+                                <img src="${productImage}" class="w-full h-auto rounded-lg" alt="${item.name}">
                             </div>
                             <div class="flex-1">
                                 <h5 class="text-lg font-bold text-gray-800">${item.name}</h5>
