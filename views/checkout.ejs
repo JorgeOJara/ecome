@@ -69,67 +69,64 @@
 <%- include('partials/footer') %>
 
 <script>
-    let currentUserId = '<%= user.id %>';
+    const currentUserId = '<%= user.id %>';
 
-    let storedCartData = JSON.parse(localStorage.getItem('cartData')) || {};
-    let cart = storedCartData.cart || {};
-    let storedUserId = storedCartData.userId;
+    async function fetchCartItems() {
+        try {
+            const response = await fetch('/api/cart');
+            const cartItems = await response.json();
+            const cartItemsContainer = document.getElementById('cart-items');
 
-    if (storedUserId !== currentUserId) {
-        cart = {};
-        localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
-    }
+            cartItemsContainer.innerHTML = '';  // Clear previous cart items
 
-    function updateCartDisplay() {
-        const cartItemsContainer = document.getElementById('cart-items');
-        cartItemsContainer.innerHTML = '';  // Clear previous cart items
+            let subtotal = 0;
+            const taxRate = 0.1;  // 10% tax rate
+            const shippingCost = 5.99;  // Flat shipping cost
 
-        let subtotal = 0;
-        const taxRate = 0.1;  // 10% tax rate
-        const shippingCost = 5.99;  // Flat shipping cost
-
-        if (cart) {
-            for (const [id, product] of Object.entries(cart)) {
-                const itemTotal = product.price * product.quantity;
+            cartItems.forEach(item => {
+                const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
 
                 const cartItemRow = `
                     <div class="cart-item mb-6 p-4 bg-white rounded-lg shadow-sm" style="box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1), -8px -8px 15px rgba(255, 255, 255, 0.7);">
                         <div class="flex items-center space-x-6">
                             <div class="w-24">
-                                <img src="https://via.placeholder.com/150" class="w-full h-auto rounded-lg" alt="${product.name}">
+                                <img src="https://via.placeholder.com/150" class="w-full h-auto rounded-lg" alt="${item.name}">
                             </div>
                             <div class="flex-1">
-                                <h5 class="text-lg font-bold text-gray-800">${product.name}</h5>
+                                <h5 class="text-lg font-bold text-gray-800">${item.name}</h5>
                                 <div class="flex justify-between items-center mt-2">
-                                    <span class="text-gray-600">Quantity: ${product.quantity}</span>
-                                    <p class="text-sm text-gray-600">$${product.price.toFixed(2)}</p>
-                                    <p class="text-sm text-gray-600">$${itemTotal.toFixed(2)}</p>
+                                    <span class="text-gray-600">Quantity: ${item.quantity}</span>
+                                    <p class="text-sm text-gray-600">$${(parseFloat(item.price) || 0).toFixed(2)}</p>
+                                    <p class="text-sm text-gray-600">$${(itemTotal || 0).toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
+
                 cartItemsContainer.insertAdjacentHTML('beforeend', cartItemRow);
-            }
+            });
+
+            const taxes = +(subtotal * taxRate).toFixed(2);
+            const total = +(subtotal + taxes + shippingCost).toFixed(2);
+
+            document.getElementById('subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('taxes').innerText = `$${taxes.toFixed(2)}`;
+            document.getElementById('shipping').innerText = `$${shippingCost.toFixed(2)}`;
+            document.getElementById('total').innerText = `$${total.toFixed(2)}`;
+
+            document.getElementById('cartData').value = JSON.stringify({ userId: currentUserId, cart: cartItems });
+            document.getElementById('subtotalInput').value = subtotal.toFixed(2);
+            document.getElementById('taxesInput').value = taxes.toFixed(2);
+            document.getElementById('shippingInput').value = shippingCost.toFixed(2);
+            document.getElementById('totalInput').value = total.toFixed(2);
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
         }
-
-        const taxes = +(subtotal * taxRate).toFixed(2);
-        const total = +(subtotal + taxes + shippingCost).toFixed(2);
-
-        document.getElementById('subtotal').innerText = `$${subtotal.toFixed(2)}`;
-        document.getElementById('taxes').innerText = `$${taxes.toFixed(2)}`;
-        document.getElementById('shipping').innerText = `$${shippingCost.toFixed(2)}`;
-        document.getElementById('total').innerText = `$${total.toFixed(2)}`;
-
-        document.getElementById('cartData').value = JSON.stringify({ userId: currentUserId, cart });
-        document.getElementById('subtotalInput').value = subtotal.toFixed(2);
-        document.getElementById('taxesInput').value = taxes.toFixed(2);
-        document.getElementById('shippingInput').value = shippingCost.toFixed(2);
-        document.getElementById('totalInput').value = total.toFixed(2);
     }
 
-    document.addEventListener('DOMContentLoaded', updateCartDisplay);
+    document.addEventListener('DOMContentLoaded', fetchCartItems);
 
     document.getElementById('checkoutForm').addEventListener('submit', function (event) {
         event.preventDefault();

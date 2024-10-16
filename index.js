@@ -184,15 +184,18 @@ app.post('/confirmOrder', isAuthenticated, async (req, res) => {
             return res.status(400).json({ message: 'No items in cart to place order.' });
         }
 
+        // Calculate subtotal and total
         const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
         const total = subtotal + parseFloat(taxes) + parseFloat(shipping);
 
+        // Convert cart data to JSON string
         const cartData = JSON.stringify(cartItems);
 
         // Generate a unique 8-digit order ID
         const generateOrderId = () => Math.floor(10000000 + Math.random() * 90000000);
         let orderId = generateOrderId();
 
+        // Ensure the generated orderId is unique
         const [existingOrder] = await db.query('SELECT order_id FROM orders WHERE order_id = ?', [orderId]);
 
         if (existingOrder.length > 0) {
@@ -206,15 +209,17 @@ app.post('/confirmOrder', isAuthenticated, async (req, res) => {
             [orderId, user_id, cartData, subtotal, taxes, shipping, total]
         );
 
-        // Clear the cart after successful order placement
+        // Clear the user's cart after successful order placement
         await db.query('DELETE FROM cart WHERE user_id = ?', [user_id]);
 
+        // Respond with success message and orderId
         res.status(200).json({ message: 'Order confirmed successfully', orderId });
     } catch (err) {
         console.error('Error confirming order:', err.message);
         res.status(500).json({ message: 'Error confirming order', error: err.message });
     }
 });
+
 
 // Other routes (existing routes)
 
@@ -289,6 +294,7 @@ app.get('/', async (req, res) => {
     }
 });
 
+
 // Product details route
 app.get('/product/:id', async (req, res) => {
     const productId = req.params.id;
@@ -307,6 +313,9 @@ app.get('/product/:id', async (req, res) => {
         res.status(500).send('Error fetching product details');
     }
 });
+
+
+
 
 // Checkout route
 app.get('/checkout', (req, res) => {
@@ -466,19 +475,27 @@ app.get('/usersTable', isAuthenticated, async (req, res) => {
 });
 
 // Admin - Display all orders
+
 app.get('/ordersTable', isAuthenticated, async (req, res) => {
     if (req.session.user.role !== 'admin') {
         return res.status(403).send('Access denied. Admins only.');
     }
 
     try {
+        // Fetch all orders
         const [orders] = await db.query('SELECT * FROM orders');
-        res.render('orders', { cssFile: 'orders.css', orders });
+
+        // Fetch all products to be used in the order details
+        const [products] = await db.query('SELECT product_id, name, price, category, description, brand, model FROM products');
+
+        // Render the orders view with both orders and products data
+        res.render('orders', { cssFile: 'orders.css', orders, products });
     } catch (err) {
         console.error('Error fetching orders:', err.message);
         res.status(500).send('Error fetching orders');
     }
 });
+
 
 // Admin - Display all contact requests
 app.get('/contact-requests', isAuthenticated, async (req, res) => {
