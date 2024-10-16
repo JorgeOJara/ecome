@@ -1,4 +1,4 @@
-<%- include('partials/header', { title: 'Product Showcase', cssFile: cssFile }) %>
+<%- include('partials/header', { title: 'Product Showcase', cssFile: 'products.css' }) %>
 
 <% if (user && user.role === 'admin') { %>
     <%- include('partials/admin_sidebar') %>
@@ -19,7 +19,7 @@
                         <div class="card-footer">
                             <% if (user) { %>
                                 <!-- Show Add to Cart button if user is logged in -->
-                                <button class="btn btn-primary" onclick="addToCart('<%= product.product_id %>', '<%= product.name %>', <%= product.price %>)">
+                                <button class="btn btn-primary" onclick="addToCart('<%= product.product_id %>')">
                                     <i class="fas fa-cart-plus"></i> Add
                                 </button>
                             <% } else { %>
@@ -66,22 +66,30 @@
     }
 
     // Cart logic for logged-in users
-    const currentUserId = "<%= user ? user.id : '' %>";
-    let storedCartData = JSON.parse(localStorage.getItem('cartData')) || {};
-    let cart = storedCartData.cart || {};
-    let storedUserId = storedCartData.userId;
-
-    if (currentUserId && storedUserId !== currentUserId) {
-        cart = {};
-        localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
-    }
-
-    function addToCart(id, name, price) {
-        if (!cart[id]) {
-            cart[id] = { id, name, price, quantity: 0 };
+    function addToCart(productId) {
+        const userId = "<%= user ? user.id : '' %>";
+        
+        if (!userId) {
+            showLoginModal();
+            return;
         }
-        cart[id].quantity += 1;
-        localStorage.setItem('cartData', JSON.stringify({ userId: currentUserId, cart }));
+
+        // AJAX request to add product to cart
+        $.ajax({
+            url: '/cart/add',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                product_id: productId,
+                quantity: 1  // Default quantity of 1 for adding to the cart
+            }),
+            success: function(response) {
+                alert('Product added to cart!');
+            },
+            error: function(error) {
+                console.error('Error adding to cart:', error);
+            }
+        });
     }
 </script>
 

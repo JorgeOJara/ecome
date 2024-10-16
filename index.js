@@ -15,8 +15,6 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE || 'ecome_db'
 });
 
-
-
 // Promisify the pool's query method to use async/await
 const db = pool.promise();
 
@@ -38,6 +36,9 @@ const upload = multer({
 ////////////////////////////////////////////
 const app = express();
 const port = 80;
+
+
+app.use(express.json());
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
@@ -70,6 +71,153 @@ function isAuthenticated(req, res, next) {
     }
 }
 
+// Routes for Cart Functionality
+
+////shop route
+app.get('/products', async (req, res) => {
+    try {
+        const [products] = await db.query('SELECT * FROM products');
+        
+        // Render the products EJS view and pass the retrieved products
+        res.render('products', { products, user: req.session.user });
+    } catch (err) {
+        console.error('Error fetching products:', err.message);
+        res.status(500).send('Error fetching products');
+    }
+});
+
+///////////////////////////////////////////////////////////////////////////////
+
+app.get('/cart', isAuthenticated, (req, res) => {
+    res.render('cart');  // Render the cart page without data for now
+});
+
+
+
+app.get('/api/cart', isAuthenticated, async (req, res) => {
+    const user_id = req.session.user.id;
+
+    try {
+        const [cartItems] = await db.query(`
+            SELECT c.cart_id, c.quantity, p.name, p.price, p.product_id
+            FROM cart c
+            JOIN products p ON c.product_id = p.product_id
+            WHERE c.user_id = ?
+        `, [user_id]);
+
+        res.json(cartItems);  // Return cart items as JSON
+    } catch (err) {
+        console.error('Error fetching cart items:', err);
+        res.status(500).json({ error: 'Failed to fetch cart items' });
+    }
+});
+
+
+
+
+// Add to Cart Route
+app.post('/cart/add', isAuthenticated, async (req, res) => {
+    const { product_id } = req.body;
+    const user_id = req.session.user.id;
+
+    try {
+        // Fetch the product details from the database using the product_id
+        const [product] = await db.query('SELECT * FROM products WHERE product_id = ?', [product_id]);
+
+        if (!product || product.length === 0) {
+            return res.status(400).json({ message: 'Invalid product' });
+        }
+
+        // Set default quantity to 1 if not provided
+        const quantity = 1;
+
+        // Insert product into cart or update the quantity if it already exists
+        await db.query(`
+            INSERT INTO cart (user_id, product_id, quantity) 
+            VALUES (?, ?, ?) 
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+        `, [user_id, product[0].product_id, quantity]);
+
+        res.status(200).json({ message: 'Product added to cart successfully' });
+    } catch (err) {
+        console.error('Error adding to cart:', err.message);
+        res.status(500).json({ message: 'Error adding to cart' });
+    }
+});
+
+
+app.post('/cart/update', isAuthenticated, async (req, res) => {
+    const { cart_id, quantity } = req.body;
+
+    try {
+        if (quantity > 0) {
+            await db.query('UPDATE cart SET quantity = ? WHERE cart_id = ?', [quantity, cart_id]);
+            res.status(200).json({ message: 'Cart updated successfully' });
+        } else {
+            await db.query('DELETE FROM cart WHERE cart_id = ?', [cart_id]);
+            res.status(200).json({ message: 'Item removed from cart' });
+        }
+    } catch (err) {
+        console.error('Error updating cart:', err.message);
+        res.status(500).json({ message: 'Error updating cart' });
+    }
+});
+
+/////////////////////////////////////////////////////////////////////
+
+
+// 4. Confirm Order Route - Fetches cart from the database
+app.post('/confirmOrder', isAuthenticated, async (req, res) => {
+    const user_id = req.session.user.id;
+    const { taxes, shipping } = req.body;
+
+    try {
+        // Fetch cart items for the user
+        const [cartItems] = await db.query(`
+            SELECT p.product_id, p.name, p.price, c.quantity 
+            FROM cart c 
+            JOIN products p ON c.product_id = p.product_id
+            WHERE c.user_id = ?
+        `, [user_id]);
+
+        if (cartItems.length === 0) {
+            return res.status(400).json({ message: 'No items in cart to place order.' });
+        }
+
+        const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+        const total = subtotal + parseFloat(taxes) + parseFloat(shipping);
+
+        const cartData = JSON.stringify(cartItems);
+
+        // Generate a unique 8-digit order ID
+        const generateOrderId = () => Math.floor(10000000 + Math.random() * 90000000);
+        let orderId = generateOrderId();
+
+        const [existingOrder] = await db.query('SELECT order_id FROM orders WHERE order_id = ?', [orderId]);
+
+        if (existingOrder.length > 0) {
+            orderId = generateOrderId(); // Generate another one if already exists
+        }
+
+        // Insert order into the orders table
+        await db.query(`
+            INSERT INTO orders (order_id, user_id, cartData, subtotal, tax, shipping, total, status, createdAt) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,
+            [orderId, user_id, cartData, subtotal, taxes, shipping, total]
+        );
+
+        // Clear the cart after successful order placement
+        await db.query('DELETE FROM cart WHERE user_id = ?', [user_id]);
+
+        res.status(200).json({ message: 'Order confirmed successfully', orderId });
+    } catch (err) {
+        console.error('Error confirming order:', err.message);
+        res.status(500).json({ message: 'Error confirming order', error: err.message });
+    }
+});
+
+// Other routes (existing routes)
+
 // Registration route
 app.get('/register', (req, res) => {
     res.render('register', { cssFile: 'register.css' });
@@ -82,11 +230,9 @@ app.post('/register', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Check how many users exist to decide whether the user should be an admin
         const [userCountRows] = await db.query('SELECT COUNT(*) as count FROM users');
         const userCount = userCountRows[0].count;
 
-        // If the userCount is 0, make this user the admin
         const role = userCount === 0 ? 'admin' : 'customer';
 
         await db.query(`INSERT INTO users (firstName, lastName, username, email, password, phone, address, role)
@@ -99,7 +245,6 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Error registering user');
     }
 });
-
 
 // Login route
 app.get('/login', (req, res) => {
@@ -163,68 +308,12 @@ app.get('/product/:id', async (req, res) => {
     }
 });
 
-// Cart route
-app.get('/cart', (req, res) => {
-    res.render('cart', { 
-        cssFile: 'cart.css', 
-        user: req.session.user // Pass the user object to the template
-    });
-});
-
-
 // Checkout route
 app.get('/checkout', (req, res) => {
     if (!req.session.user) {
         return res.render('checkout', { user: null });
     }
     res.render('checkout', { user: req.session.user });
-});
-
-// Checkout process
-app.post('/checkout', isAuthenticated, async (req, res) => {
-    const userId = req.session.user.id;
-    const { cartData, subtotal, taxes, shipping, total } = req.body;
-
-    try {
-        const cartDataJson = JSON.stringify(cartData);
-        await db.query(`INSERT INTO orders (user_id, cartData, subtotal, tax, shipping, total, status, createdAt)
-                        VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())`,
-                       [userId, cartDataJson, subtotal, taxes, shipping, total]);
-        res.send('Order placed successfully!');
-    } catch (err) {
-        console.error('Error saving order:', err.message);
-        res.status(500).send('Error saving order');
-    }
-});
-
-
-// Confirm order (Simulated payment) - Route
-app.post('/confirmOrder', isAuthenticated, async (req, res) => {
-    const { cartData, userId, subtotal, taxes, shipping, total } = req.body;
-
-    try {
-        const generateOrderId = () => Math.floor(10000000 + Math.random() * 90000000);
-        let orderId = generateOrderId();
-
-        const [existingOrder] = await db.query('SELECT order_id FROM orders WHERE order_id = ?', [orderId]);
-
-        if (existingOrder.length > 0) {
-            orderId = generateOrderId(); // Generate another one if already exists
-        }
-
-        const cartDataJson = JSON.stringify(cartData);
-
-        await db.query(`
-            INSERT INTO orders (order_id, user_id, cartData, subtotal, tax, shipping, total, status, createdAt) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())`,
-            [orderId, userId, cartDataJson, subtotal, taxes, shipping, total]
-        );
-
-        res.status(200).json({ message: 'Order confirmed successfully', orderId });
-    } catch (err) {
-        console.error('Error confirming order:', err.message);
-        res.status(500).json({ message: 'Error confirming order', error: err.message });
-    }
 });
 
 // Contact route
@@ -317,19 +406,34 @@ app.post('/updateSlide', isAuthenticated, async (req, res) => {
     }
 });
 
-app.get('/products', async (req, res) => {
+// Admin - Add new product POST handler
+app.post('/add-product', upload, isAuthenticated, async (req, res) => {
+    const {
+        name, description, price, discount_amount, stock, category, subcategory, brand, model,
+        sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info
+    } = req.body;
+
+    const images = req.files.map(file => file.filename);
+
     try {
-        // Fetch all products from the database
-        const [rows] = await db.query('SELECT * FROM products');
-        
-        // Render the products page and pass the retrieved products
-        res.render('products', { cssFile: 'products.css', products: rows, user: req.session.user });
+        const [result] = await db.query(`
+            INSERT INTO products (name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+            [name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info]
+        );
+
+        const productId = result.insertId;
+
+        for (const image of images) {
+            await db.query(`INSERT INTO product_images (product_id, image_path) VALUES (?, ?)`, [productId, image]);
+        }
+
+        res.render('admin_add_product', { cssFile: 'admin_add_product.css', success: true });
     } catch (err) {
-        console.error('Error fetching products:', err.message);
-        res.status(500).send('Error fetching products');
+        console.error('Error adding product:', err.message);
+        res.status(500).send('Error adding product');
     }
 });
-
 
 // Admin - Display all products
 app.get('/productsTable', isAuthenticated, async (req, res) => {
@@ -388,82 +492,6 @@ app.get('/contact-requests', isAuthenticated, async (req, res) => {
     } catch (err) {
         console.error('Error fetching contact requests:', err.message);
         res.status(500).send('Error fetching contact requests');
-    }
-});
-
-// Admin - Add new product route
-app.get('/add-product', isAuthenticated, (req, res) => {
-    if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).send('Access denied. Admins only.');
-    }
-
-    res.render('admin_add_product', { cssFile: 'admin_add_product.css' });
-});
-
-// Admin - Add new product POST handler
-app.post('/add-product', upload, isAuthenticated, async (req, res) => {
-    const {
-        name, description, price, discount_amount, stock, category, subcategory, brand, model,
-        sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info
-    } = req.body;
-
-    const images = req.files.map(file => file.filename);
-
-    try {
-        const [result] = await db.query(`
-            INSERT INTO products (name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-            [name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, additional_info]
-        );
-
-        const productId = result.insertId;
-
-        for (const image of images) {
-            await db.query(`INSERT INTO product_images (product_id, image_path) VALUES (?, ?)`, [productId, image]);
-        }
-
-        res.render('admin_add_product', { cssFile: 'admin_add_product.css', success: true });
-    } catch (err) {
-        console.error('Error adding product:', err.message);
-        res.status(500).send('Error adding product');
-    }
-});
-
-// Admin - Edit product route
-app.get('/products/:product_id', isAuthenticated, async (req, res) => {
-    const productId = req.params.product_id;
-
-    try {
-        const [rows] = await db.query('SELECT * FROM products WHERE product_id = ?', [productId]);
-        const product = rows[0];
-
-        if (!product) {
-            return res.status(404).send('Product not found');
-        }
-
-        res.render('edit_product', { product, cssFile: 'edit_product.css' });
-    } catch (err) {
-        console.error('Error fetching product details:', err.message);
-        res.status(500).send('Error fetching product details');
-    }
-});
-
-// Admin - Update product POST handler
-app.post('/products/:product_id/edit', isAuthenticated, async (req, res) => {
-    const productId = req.params.product_id;
-    const { name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy } = req.body;
-
-    try {
-        await db.query(`
-            UPDATE products SET name = ?, description = ?, price = ?, discount_amount = ?, stock = ?, category = ?, subcategory = ?, brand = ?, model = ?, sku = ?, weight = ?, dimensions = ?, color = ?, size = ?, material = ?, release_date = ?, warranty = ?, return_policy = ?
-            WHERE product_id = ?`, 
-            [name, description, price, discount_amount, stock, category, subcategory, brand, model, sku, weight, dimensions, color, size, material, release_date, warranty, return_policy, productId]
-        );
-
-        res.render('edit_product', { product: req.body, cssFile: 'edit_product.css', success: true });
-    } catch (err) {
-        console.error('Error updating product:', err.message);
-        res.status(500).send('Error updating product');
     }
 });
 

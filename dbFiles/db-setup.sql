@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS orders (
     order_id VARCHAR(8) PRIMARY KEY,  -- Unique 8-digit order number
     user_id INT,
-    cartData TEXT,
     subtotal DECIMAL(10,2),              -- Subtotal of all items in the cart
     tax DECIMAL(10,2),                   -- Tax amount
     shipping DECIMAL(10,2),              -- Shipping amount
@@ -49,7 +48,18 @@ CREATE TABLE IF NOT EXISTS products (
     return_policy TEXT,
     additional_info TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Create cart table
+CREATE TABLE IF NOT EXISTS cart (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,  -- Foreign key to users table
+    product_id INT,  -- Foreign key to products table
+    quantity INT DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 -- Create contact_requests table
@@ -66,7 +76,7 @@ CREATE TABLE IF NOT EXISTS product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     image_path VARCHAR(255),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 -- Create slideshow table with position column
