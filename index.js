@@ -331,13 +331,22 @@ app.get('/product/:id', async (req, res) => {
     const productId = req.params.id;
 
     try {
-        const [rows] = await db.query('SELECT * FROM products WHERE product_id = ?', [productId]);
-        const product = rows[0];
+        // Fetch the product details from the products table
+        const [productRows] = await db.query('SELECT * FROM products WHERE product_id = ?', [productId]);
+        const product = productRows[0];
 
         if (!product) {
             return res.status(404).send('Product not found');
         }
 
+        // Fetch product images from the product_images table
+        const [imageRows] = await db.query('SELECT image_path FROM product_images WHERE product_id = ?', [productId]);
+        const images = imageRows.map(row => row.image_path);
+
+        // Attach images to the product object
+        product.images = images.length > 0 ? images : null; // Set null if no images found
+
+        // Render the product details page with the product and images
         res.render('product_details', { product });
     } catch (err) {
         console.error('Error fetching product details:', err.message);

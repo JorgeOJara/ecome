@@ -3,10 +3,12 @@
 <div class="container mx-auto mt-8">
     <div class="flex flex-col md:flex-row gap-8">
         <div class="md:w-1/2">
-            <!-- Check if product image exists, otherwise display a placeholder -->
-            <img src="<%= product.image_url ? product.image_url : 'https://via.placeholder.com/800x800' %>" 
-                 class="rounded-lg shadow-md" alt="<%= product.name %>" 
-                 style="width:100%; height:auto;">
+            <!-- Check if the product has images, otherwise display a placeholder -->
+            <% if (product.images && product.images.length > 0) { %>
+                <img src="/uploads/<%= product.images[0] %>" class="rounded-lg shadow-md" alt="<%= product.name %>" style="width:100%; height:auto;">
+            <% } else { %>
+                <img src="https://via.placeholder.com/800x800" class="rounded-lg shadow-md" alt="<%= product.name %>" style="width:100%; height:auto;">
+            <% } %>
         </div>
         <div class="md:w-1/2">
             <h2 class="text-2xl font-bold text-gray-800 mb-4"><%= product.name %></h2>
